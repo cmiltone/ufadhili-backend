@@ -1,0 +1,31 @@
+{
+    "[typescript]": {
+        //"editor.formatOnSave": true,
+        "editor.formatOnPaste": true
+    },
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.wordWrap": "on",
+        "editor.renderWhitespace": "all",
+        "editor.acceptSuggestionOnEnter": "off"
+    },
+    "vetur.format.styleInitialIndent": true,
+    "vetur.format.scriptInitialIndent": true,
+    "prettier.disableLanguages": [],
+    "prettier.eslintIntegration": true,
+    "vetur.format.defaultFormatter.html": "prettyhtml",
+    "vetur.format.defaultFormatterOptions": {
+        "js-beautify-html": {},
+        "prettyhtml": {
+            "printWidth": 80,
+            "singleQuote": false
+        }
+    },
+    "stylusSupremacy.insertColons": false,
+    "stylusSupremacy.insertLeadingZeroBeforeFraction": false,
+    "stylusSupremacy.insertSemicolons": false,
+    "stylusSupremacy.insertBraces": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    }
+}

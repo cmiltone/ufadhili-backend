@@ -1,0 +1,2 @@
+export const EXCHANGE_RATES_API_URL = process.env.EXCHANGE_RATES_API_URL;
+export const EXCHANGE_RATES_API_KEY = process.env.EXCHANGE_RATES_API_KEY;

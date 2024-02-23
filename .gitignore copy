@@ -1,0 +1,11 @@
+node_modules/*
+.env
+.vscode
+dist
+package.tgz
+deploy_key
+ecosystem.config.js
+_file/*
+_video/*
+.env.prod
+.env.copy
