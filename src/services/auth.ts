@@ -3,7 +3,6 @@ import { User, UserModel, UserRole } from '../models/User';
 import { TokenService } from './token';
 import argon2 from 'argon2';
 import APIError from '../util/APIError';
-import { EmailService } from './email';
 
 interface RegistrationInput {
   fullName: User['fullName'];
@@ -27,9 +26,6 @@ interface LoginInput {
 export class AuthService {
   @inject(TokenService)
   private tokenService: TokenService;
-
-  @inject(EmailService)
-  private emailService: EmailService;
 
   async register(data: RegistrationInput, options: { password: string; verify?: boolean }): Promise<AuthResult> {
     const { password } = options;

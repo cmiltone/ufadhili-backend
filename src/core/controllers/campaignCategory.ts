@@ -36,9 +36,9 @@ export class CampaignCategoryController extends BaseHttpController {
       response,
     } = this.httpContext;
 
-    const campaign = await this.campaignCategoryService.create({ title, description });
+    const campaignCategory = await this.campaignCategoryService.create({ title, description });
 
-    response.json({ campaign });
+    response.json({ campaignCategory });
   }
 
   @httpPut(
@@ -60,9 +60,9 @@ export class CampaignCategoryController extends BaseHttpController {
       response,
     } = this.httpContext;
 
-    const campaign = await this.campaignCategoryService.update(campaignCategoryId, { title, description, status });
+    const campaignCategory = await this.campaignCategoryService.update(campaignCategoryId, { title, description, status });
 
-    response.json({ campaign });
+    response.json({ campaignCategory });
   }
 
   @httpGet(
@@ -86,9 +86,9 @@ export class CampaignCategoryController extends BaseHttpController {
       .query as any;
 
     if (campaignCategoryId) {
-      const campaign = await this.campaignCategoryService.findById(campaignCategoryId);
+      const campaignCategory = await this.campaignCategoryService.findById(campaignCategoryId);
 
-      this.httpContext.response.json({ campaign });
+      this.httpContext.response.json({ campaignCategory });
 
       return;
     }
@@ -123,13 +123,13 @@ export class CampaignCategoryController extends BaseHttpController {
     '/:campaignCategoryId',
     celebrate({
       params: Joi.object({
-        campaignId: Joi.string().required(),
+        campaignCategoryId: Joi.string().required(),
       }),
     }),
   )
   async remove(@requestParam('campaignCategoryId') campaignCategoryId: string): Promise<void> {
-    const campaign = await this.campaignCategoryService.delete(campaignCategoryId);
+    const campaignCategory = await this.campaignCategoryService.delete(campaignCategoryId);
 
-    this.httpContext.response.json({ campaign });
+    this.httpContext.response.json({ campaignCategory });
   }
 }

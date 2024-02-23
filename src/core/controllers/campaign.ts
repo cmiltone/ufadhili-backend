@@ -33,7 +33,7 @@ export class CampaignController extends BaseHttpController {
           amount: Joi.number().min(0),
           currency: Joi.string().allow('KES'),
         }).required(),
-        category: Joi.array().items(Joi.string()),
+        category: Joi.string(),
       }),
     }),
   )
@@ -85,7 +85,7 @@ export class CampaignController extends BaseHttpController {
           amount: Joi.number().min(0),
           currency: Joi.string().allow('KES'),
         }),
-        category: Joi.array().items(Joi.string()),
+        category: Joi.string(),
         status: Joi.string().allow('active', 'inactive'),
       }),
     }),

@@ -25,7 +25,7 @@ export class AppSettingController extends BaseHttpController {
 
     const appSetting = await this.sessingService.get();
 
-    if (!isAdmin) appSetting.payStackSecretKey = "***";
+    if (!isAdmin && appSetting) appSetting.payStackSecretKey = "***";
 
     this.httpContext.response.json({ appSetting  });
   }

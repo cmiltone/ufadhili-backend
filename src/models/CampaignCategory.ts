@@ -26,6 +26,7 @@ const CampaignCategorySchema = new Schema(
       type: String,
       required: true,
       es_indexed: true,
+      unique: true,
     },
     description: {
       type: String,

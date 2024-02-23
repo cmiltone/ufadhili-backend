@@ -1,7 +1,7 @@
 import './auth'
 import './file'
 import './campaign'
-import './campaignCategoriy'
+import './campaignCategory'
 import './user'
 import './webHook'
 import './appSetting'

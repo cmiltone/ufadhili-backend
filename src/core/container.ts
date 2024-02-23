@@ -1,6 +1,5 @@
 import { Container } from 'inversify';
 import { AuthService } from '../services/auth';
-import { EmailService } from '../services/email';
 import { CampaignService } from '../services/campaign';
 import { CampaignCategoryService } from '../services/campaignCategory';
 import { TokenService } from '../services/token';
@@ -25,7 +24,6 @@ export function getContainer(): Container {
   container.bind<UserService>(UserService).to(UserService);
   container.bind<CampaignService>(CampaignService).to(CampaignService);
   container.bind<CampaignCategoryService>(CampaignCategoryService).to(CampaignCategoryService);
-  container.bind<EmailService>(EmailService).to(EmailService);
   container.bind<HookAuthMiddleware>(HookAuthMiddleware).to(HookAuthMiddleware);
   container.bind<AppSettingService>(AppSettingService).to(AppSettingService);
   container.bind<AuthAdminMiddleware>(AuthAdminMiddleware).to(AuthAdminMiddleware);

@@ -40,6 +40,7 @@ const CampaignSchema = new Schema(
       type: String,
       required: true,
       es_indexed: true,
+      unique: true,
     },
     description: {
       type: String,
@@ -55,7 +56,7 @@ const CampaignSchema = new Schema(
       ref: 'User',
       required: true,
     },
-    price: {
+    target: {
       type: priceSchema,
       required: true,
       default: 0,
