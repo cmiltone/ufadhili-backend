@@ -121,7 +121,7 @@ export class PaymentEngineService {
 
     if (!payout) return false;
 
-    const populate = [{ path: 'user' }];
+    const populate = [{ path: 'campaign' }];
 
     await payout.populate(populate);
 
@@ -156,9 +156,7 @@ export class PaymentEngineService {
 
       await payout.populate(populate);
 
-
-
-      //update wallet
+      //update current
       const campaign = await CampaignModel.findById((payout.campaign as Campaign)._id);
 
       if (campaign) {
@@ -172,6 +170,7 @@ export class PaymentEngineService {
           campaign: campaign._id,
           current: prevCurrentBalanace - decrement,
           payout: payout._id,
+          raised: campaign.raised,
           type: 'payout',
         }).save();
 

@@ -12,7 +12,7 @@ import { TransactionService } from '../../services/transaction';
 import { Query } from '../../types/db';
 import { AuthAdminMiddleware, AuthMiddleware } from '../middlewares/auth';
 
-@controller('/v1/wallet-transaction', AuthMiddleware)
+@controller('/v1/transaction', AuthMiddleware)
 export class TransactionController extends BaseHttpController {
   @inject(TransactionService)
   private transactionService: TransactionService;
@@ -23,7 +23,7 @@ export class TransactionController extends BaseHttpController {
     celebrate({
       query: Joi.object({
         transactionId: Joi.string(),
-        userId: Joi.string(),
+        campaignId: Joi.string(),
         status: Joi.string(),
         q: Joi.string().allow(''),
         sort: Joi.string(),
@@ -35,7 +35,7 @@ export class TransactionController extends BaseHttpController {
     }),
   )
   async retrieve(): Promise<void> {
-    const { transactionId, sort, page, limit, dateStart, dateEnd, status, userId, q } = this.httpContext.request
+    const { transactionId, sort, page, limit, dateStart, dateEnd, status, campaignId, q } = this.httpContext.request
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .query as any;
 
@@ -49,7 +49,7 @@ export class TransactionController extends BaseHttpController {
 
     let query: Query = {};
 
-    if (userId) query = { ...query, ...{ user: userId } };
+    if (campaignId) query = { ...query, ...{ campaign: campaignId } };
 
     if (status) query = { ...query, ...{ status } };
 
@@ -71,8 +71,8 @@ export class TransactionController extends BaseHttpController {
       limit,
       q,
       populate: [
-        { path: 'user', },
-        { path: 'payment', populate: [{ path: 'campaignEnrolment', populate: [{ path: 'user' }, { path: 'campaign' }]}]},
+        { path: 'campaign', },
+        { path: 'payment', populate: [{ path: 'campaign' }, { path: 'user'}]},
         { path: 'payout' },
       ],
     });

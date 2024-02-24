@@ -168,15 +168,15 @@ export class PaystackService {
 
     if (!user) throw new APIError({ message: 'User not Found', status: 404 });
 
-    if (!user.wallet?.recipientCode) return user;
+    if (!user.paystackRecipientCode) return user;
 
-    const url = `${PAYSTACK_API_URL}/transferrecipient/${user.wallet.recipientCode}`;
+    const url = `${PAYSTACK_API_URL}/transferrecipient/${user.paystackRecipientCode}`;
 
     try {
       const res = await axios.delete(url, { headers });
       if (res.status) {
         if (res.data.status) {
-          user = await UserModel.findByIdAndUpdate(user._id, { $set: { 'wallet.recipientCode': '' } }, { new: true, runValidators: true });
+          user = await UserModel.findByIdAndUpdate(user._id, { $set: { paystackRecipientCode: '' } }, { new: true, runValidators: true });
         }
       }
     } catch (err) {

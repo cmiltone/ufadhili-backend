@@ -12,7 +12,7 @@ export class TransactionService {
 
     if (!transaction) throw new APIError({ message: ' Transaction  not found', status: 404 });
 
-    await transaction.populate([{ path: 'user', }]);
+    await transaction.populate([{ path: 'campaign', }]);
 
     return transaction;
   }
@@ -26,11 +26,11 @@ export class TransactionService {
   async delete(transactionId: string): Promise<Transaction> {
     const transaction = await TransactionModel.findById(transactionId);
 
-    if (!transaction) throw new APIError({ message: ' Transaction  not found', status: 404 });
+    if (!transaction) throw new APIError({ message: 'Transaction not found', status: 404 });
 
     await TransactionModel.findByIdAndDelete(transactionId);
 
-    await transaction.populate({ path: 'user', });
+    await transaction.populate({ path: 'campaign', });
 
     return transaction;
   }

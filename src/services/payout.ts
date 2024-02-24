@@ -29,6 +29,8 @@ export class PayoutService {
 
     if (!campaign) throw new APIError({ message: 'Campaign not found', status: 400 });
 
+    campaign.populate([{ path: 'owner' }]);
+
     if (data.amount > campaign.current) throw new APIError({ message: 'Insuffient funds.', status: 400 });
 
     const appSetting = await AppSettingModel.findOne({});
@@ -59,7 +61,7 @@ export class PayoutService {
         payout.ref = res.data.data.reference;
       }
     } catch (err) {
-      console.log("error creating transfer: ", err)
+      console.log("error creating transfer: ", err?.response?.data)
       throw new APIError({ message: 'Payout failed. Please try again later.', status: 500 })
     }
 
