@@ -43,29 +43,27 @@ export class PaymentService {
       email?: string;
       provider?: 'mpesa',
       campaign: Payment['campaign'];
+      user: Payment['user'];
       amount: number;
     },
   ): Promise<Payment> {
     let { amount } = data;
     const campaign = await CampaignModel.findById(data.campaign);
 
-    if (!campaign) throw new APIError({ message: 'Campaign not enroled', status: 404 });
+    if (!campaign) throw new APIError({ message: 'Campaign not found', status: 404 });
 
-    await campaign.populate([{ path: 'campaign', populate: [{ path: 'instructor' }] }, { path: 'user' }]);
+    await campaign.populate([{ path: 'owner' }]);
 
     const reference = `ref_${Date.now()}`;
     const appSetting = await AppSettingModel.findOne({});
 
     if (data.provider === 'mpesa') { // factoring in paystack fee
-      amount = amount + (amount * (1.5 / 100));// TODO: make paystack fee configurable
+      amount = Math.ceil(amount + (amount * (1.5 / 100)));// TODO: make paystack fee configurable
     }
-
-    const exististingPayment = await PaymentModel.findOne({ campaign: campaign._id, status: 'paid' });
-
-    if (exististingPayment) throw new APIError({ message: 'Payment already made', status: 400 });
 
     const payment = await new PaymentModel({
       campaign: campaign._id,
+      user: data.user,
       ref: reference,
       amount,
       currency: campaign.currency,
@@ -95,7 +93,7 @@ export class PaymentService {
         // code
       }
     } catch (err) {
-      console.log("error creating charge: ", err)
+      console.log("error creating charge: ", err?.response?.data)
       throw new APIError({ message: 'Payment failed', status: 500 })
     }
 
@@ -108,6 +106,7 @@ export class PaymentService {
     data: {
       reference: string;
       campaign: Payment['campaign'];
+      user: Payment['user'];
       amount: number;
     },
   ): Promise<Payment> {
@@ -116,7 +115,7 @@ export class PaymentService {
 
     if (!campaign) throw new APIError({ message: 'Campaign not enroled', status: 404 });
 
-    await campaign.populate([{ path: 'campaign', populate: [{ path: 'instructor' }] }, { path: 'user' }]);
+    await campaign.populate([{ path: 'owner' }]);
 
     const reference = data.reference;
     const appSetting = await AppSettingModel.findOne({});
@@ -124,12 +123,9 @@ export class PaymentService {
     // factoring in paystack fee
     amount = amount + (amount * (2.9 / 100));// TODO: make paystack fee configurable and check country
 
-    const exististingPayment = await PaymentModel.findOne({ campaign: campaign._id, status: 'paid' });
-
-    if (exististingPayment) throw new APIError({ message: 'Payment already made', status: 400 });
-
     const payment = await new PaymentModel({
       campaign: campaign._id,
+      user: data.user,
       ref: reference,
       amount,
       currency: campaign.currency,

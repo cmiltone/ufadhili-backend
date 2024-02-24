@@ -49,21 +49,22 @@ export class PaymentController extends BaseHttpController {
     celebrate({
       body: Joi.object({
         campaignId: Joi.string().required(),
+        userId: Joi.string().required(),
         phone: Joi.string().required(),
         provider: Joi.string().equal('mpesa').required(),
-        amout: Joi.number().required(),
+        amount: Joi.number().required(),
       }),
     }),
   )
   async payByMobileMoney(): Promise<void> {
     const {
       request: {
-        body: { campaignId, phone, provider, amount },
+        body: { campaignId, userId, phone, provider, amount },
       },
       response,
     } = this.httpContext;
 
-    const payment = await this.paymentService.payByMoileMoney({ campaign: campaignId, phone, provider, amount });
+    const payment = await this.paymentService.payByMoileMoney({ campaign: campaignId, user: userId, phone, provider, amount });
 
     response.json({ payment });
   }
@@ -74,20 +75,21 @@ export class PaymentController extends BaseHttpController {
     celebrate({
       body: Joi.object({
         campaignId: Joi.string().required(),
+        userId: Joi.string().required(),
         reference: Joi.string().required(),
-        amout: Joi.number().required(),
+        amount: Joi.number().required(),
       }),
     }),
   )
   async payByCard(): Promise<void> {
     const {
       request: {
-        body: { campaignId, reference, amount },
+        body: { campaignId, reference, userId, amount },
       },
       response,
     } = this.httpContext;
 
-    const payment = await this.paymentService.payByCard({ campaign: campaignId, reference, amount });
+    const payment = await this.paymentService.payByCard({ campaign: campaignId, user: userId, reference, amount });
 
     response.json({ payment });
   }

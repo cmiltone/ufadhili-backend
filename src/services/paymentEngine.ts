@@ -15,7 +15,7 @@ export class PaymentEngineService {
 
   private populate = [
     {
-      path: 'Campaign',
+      path: 'campaign',
       populate: [
         { path: 'owner' },
       ]

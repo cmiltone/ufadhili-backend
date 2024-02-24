@@ -17,13 +17,13 @@ import { upload, UploadMiddleware } from '../middlewares/upload';
 import { FILE_PATH } from '../../config/multer';
 import { fileJoi } from '../../util/joi';
 
-@controller('/v1/campaign', AuthMiddleware)
+@controller('/v1/campaign')
 export class CampaignController extends BaseHttpController {
   @inject(CampaignService)
   private campaignService: CampaignService;
 
   @httpPost(
-    '/',
+    '/', AuthMiddleware,
     celebrate({
       body: Joi.object({
         ownerId: Joi.string().required(),
@@ -49,7 +49,7 @@ export class CampaignController extends BaseHttpController {
   }
 
   @httpPut(
-    '/:campaignId/cover-image',
+    '/:campaignId/cover-image', AuthMiddleware,
     upload({ filePath: FILE_PATH, fileName: 'file' }),
     UploadMiddleware,
     celebrate({
@@ -73,7 +73,7 @@ export class CampaignController extends BaseHttpController {
   }
 
   @httpPut(
-    '/:campaignId',
+    '/:campaignId', AuthMiddleware,
     celebrate({
       body: Joi.object({
         ownerId: Joi.string(),
@@ -164,7 +164,7 @@ export class CampaignController extends BaseHttpController {
   }
 
   @httpDelete(
-    '/:campaignId',
+    '/:campaignId', AuthMiddleware,
     celebrate({
       params: Joi.object({
         campaignId: Joi.string().required(),

@@ -61,14 +61,14 @@ export class PaystackService {
       email: user.email,
       decription: 'A ufadhili Creator',
       authorization_code: data.authorizationCode,
-      currency: user.wallet.currency,
+      currency: 'KES',
     };
 
     try {
       const res = await axios.post<TransferRecipientResponse>(url, pickBy(transferrecipient), { headers });
       if (res.status) {
         if (res.data.status) {
-          user = await UserModel.findByIdAndUpdate(user._id, { $set: { 'wallet.recipientCode': res.data.data.recipient_code } }, { new: true, runValidators: true }); 
+          user = await UserModel.findByIdAndUpdate(user._id, { $set: { paystackRecipientCode: res.data.data.recipient_code } }, { new: true, runValidators: true }); 
         }
       }
     } catch (err) {
