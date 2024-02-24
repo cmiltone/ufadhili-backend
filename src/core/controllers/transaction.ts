@@ -8,21 +8,21 @@ import {
   requestParam,
 } from 'inversify-express-utils';
 
-import { WalletTransactionService } from '../../services/walletTransaction';
+import { TransactionService } from '../../services/transaction';
 import { Query } from '../../types/db';
 import { AuthAdminMiddleware, AuthMiddleware } from '../middlewares/auth';
 
 @controller('/v1/wallet-transaction', AuthMiddleware)
-export class WalletTransactionController extends BaseHttpController {
-  @inject(WalletTransactionService)
-  private walletTransactionService: WalletTransactionService;
+export class TransactionController extends BaseHttpController {
+  @inject(TransactionService)
+  private transactionService: TransactionService;
 
   @httpGet(
     '/',
     AuthMiddleware,
     celebrate({
       query: Joi.object({
-        walletTransactionId: Joi.string(),
+        transactionId: Joi.string(),
         userId: Joi.string(),
         status: Joi.string(),
         q: Joi.string().allow(''),
@@ -35,14 +35,14 @@ export class WalletTransactionController extends BaseHttpController {
     }),
   )
   async retrieve(): Promise<void> {
-    const { walletTransactionId, sort, page, limit, dateStart, dateEnd, status, userId, q } = this.httpContext.request
+    const { transactionId, sort, page, limit, dateStart, dateEnd, status, userId, q } = this.httpContext.request
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .query as any;
 
-    if (walletTransactionId) {
-      const walletTransaction = await this.walletTransactionService.findById(walletTransactionId);
+    if (transactionId) {
+      const transaction = await this.transactionService.findById(transactionId);
 
-      this.httpContext.response.json({ walletTransaction });
+      this.httpContext.response.json({ transaction });
 
       return;
     }
@@ -65,7 +65,7 @@ export class WalletTransactionController extends BaseHttpController {
         },
       };
 
-    const walletTransactionPage = await this.walletTransactionService.page(query, {
+    const transactionPage = await this.transactionService.page(query, {
       sort,
       page,
       limit,
@@ -77,21 +77,21 @@ export class WalletTransactionController extends BaseHttpController {
       ],
     });
 
-    this.httpContext.response.json({ walletTransactionPage });
+    this.httpContext.response.json({ transactionPage });
   }
 
   @httpDelete(
-    '/:walletTransactionId',
+    '/:transactionId',
     AuthAdminMiddleware,
     celebrate({
       params: Joi.object({
-        walletTransactionId: Joi.string().required(),
+        transactionId: Joi.string().required(),
       }),
     }),
   )
-  async remove(@requestParam('walletTransactionId') walletTransactionId: string): Promise<void> {
-    const walletTransaction = await this.walletTransactionService.delete(walletTransactionId);
+  async remove(@requestParam('transactionId') transactionId: string): Promise<void> {
+    const transaction = await this.transactionService.delete(transactionId);
 
-    this.httpContext.response.json({ walletTransaction });
+    this.httpContext.response.json({ transaction });
   }
 }

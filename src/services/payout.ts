@@ -7,7 +7,8 @@ import { PageOptions, PageResult, Query } from '../types/db';
 import APIError from '../util/APIError';
 import { PAYSTACK_API_URL } from '../config/paystack';
 import { AppSettingModel } from '../models/AppSetting';
-import { UserModel } from '../models/User';
+import { CampaignModel } from '../models/Campaign';
+import { User } from '../models/User';
 
 type TransferResponse = {
   status: boolean;
@@ -19,16 +20,16 @@ type TransferResponse = {
 export class PayoutService {
   async initiate(
     data: {
-      userId: string;
+      campaignId: string;
       amount: number;
       currency: string;
     },
   ): Promise<Payout> {
-    const user = await UserModel.findById(data.userId);
+    const campaign = await CampaignModel.findById(data.campaignId);
 
-    if (!user) throw new APIError({ message: 'User not found', status: 400 });
+    if (!campaign) throw new APIError({ message: 'Campaign not found', status: 400 });
 
-    if (data.amount > user.wallet.amount) throw new APIError({ message: 'Insuffient funds in your wallet.', status: 400 });
+    if (data.amount > campaign.current) throw new APIError({ message: 'Insuffient funds.', status: 400 });
 
     const appSetting = await AppSettingModel.findOne({});
     const url = `${PAYSTACK_API_URL}/transfer`;
@@ -37,7 +38,7 @@ export class PayoutService {
     }
 
     const transfer = {
-      recipient: user.wallet.recipientCode,
+      recipient: (campaign.owner as User).paystackRecipientCode,
       amount: data.amount * 100,
       currency: data.currency,
       source: 'balance'
@@ -49,7 +50,7 @@ export class PayoutService {
       ref: '',
       amount: data.amount,
       currency: data.currency,
-      user: user._id,
+      campaign: campaign._id,
     }
 
     try {
@@ -71,7 +72,7 @@ export class PayoutService {
     data: {
       ref: Payout['ref'];
       amount: Payout['amount'];
-      user: Payout['user'];
+      campaign: Payout['campaign'];
       currency: Payout['currency'];
       status?: Payout['status'];
       paymentMethod?: Payout['paymentMethod'];
@@ -81,7 +82,7 @@ export class PayoutService {
   ): Promise<Payout> {
     const payout = await new PayoutModel(pickBy(data)).save();
 
-    await payout.populate([{ path: 'user' }]);
+    await payout.populate([{ path: 'campaign' }]);
 
     return payout;
   }
@@ -91,7 +92,7 @@ export class PayoutService {
     update: {
       ref?: Payout['ref'];
       amount?: Payout['amount'];
-      user?: Payout['user'];
+      campaign?: Payout['campaign'];
       currency?: Payout['currency'];
       status?: Payout['status'];
       paymentMethod?: Payout['paymentMethod'];
@@ -105,7 +106,7 @@ export class PayoutService {
 
     payout = await PayoutModel.findByIdAndUpdate(PayoutId, { $set: pickBy(update) }, { runValidators: true, new: true });
 
-    await payout.populate([{ path: 'user' }]);
+    await payout.populate([{ path: 'campaign' }]);
 
     return payout;
   }
@@ -115,7 +116,7 @@ export class PayoutService {
 
     if (!payout) throw new APIError({ message: 'Payout not found', status: 404 });
 
-    await payout.populate([{ path: 'user' }]);
+    await payout.populate([{ path: 'campaign' }]);
 
     return payout;
   }
@@ -141,7 +142,7 @@ export class PayoutService {
 
     await PayoutModel.findByIdAndDelete(payoutId);
 
-    await payout.populate([{ path: 'user' }]);
+    await payout.populate([{ path: 'campaign' }]);
 
     return payout;
   }

@@ -10,7 +10,7 @@ import { HookAuthMiddleware } from './middlewares/hook';
 import { AppSettingService } from '../services/appSetting';
 import { PaymentEngineService } from '../services/paymentEngine';
 import { PaymentService } from '../services/payment';
-import { WalletTransactionService } from '../services/walletTransaction';
+import { TransactionService } from '../services/transaction';
 import { PayoutService } from '../services/payout';
 import { PaystackService } from '../services/paystack';
 
@@ -29,7 +29,7 @@ export function getContainer(): Container {
   container.bind<AuthAdminMiddleware>(AuthAdminMiddleware).to(AuthAdminMiddleware);
   container.bind<PaymentEngineService>(PaymentEngineService).to(PaymentEngineService);
   container.bind<PaymentService>(PaymentService).to(PaymentService);
-  container.bind<WalletTransactionService>(WalletTransactionService).to(WalletTransactionService);
+  container.bind<TransactionService>(TransactionService).to(TransactionService);
   container.bind<PayoutService>(PayoutService).to(PayoutService);
   container.bind<PaystackService>(PaystackService).to(PaystackService);
 

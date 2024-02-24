@@ -2,12 +2,12 @@ import mongoose, { Schema, model } from 'mongoose';
 
 import { DefaultDocument, PagedModel, SearchableModel } from '../types/db';
 import { defaultPlugin } from '../util/search';
-import { User } from './User';
+import { Campaign } from './Campaign';
 
 export type Payout = {
   _id?: string;
   ref: string;
-  user: string | User;
+  campaign: string | Campaign;
   amount: number;
   currency: string;
   status: 'paid' | 'pending';
@@ -28,9 +28,9 @@ const PayoutSchema = new Schema(
       type: String,
       required: true,
     },
-    user: {
+    campaign: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Campaign',
       required: true,
     },
     status: {

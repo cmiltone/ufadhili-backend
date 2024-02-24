@@ -43,8 +43,10 @@ export class PaymentService {
       email?: string;
       provider?: 'mpesa',
       campaign: Payment['campaign'];
+      amount: number;
     },
   ): Promise<Payment> {
+    let { amount } = data;
     const campaign = await CampaignModel.findById(data.campaign);
 
     if (!campaign) throw new APIError({ message: 'Campaign not enroled', status: 404 });
@@ -53,8 +55,6 @@ export class PaymentService {
 
     const reference = `ref_${Date.now()}`;
     const appSetting = await AppSettingModel.findOne({});
-
-    let amount = campaign.target.amount;
 
     if (data.provider === 'mpesa') { // factoring in paystack fee
       amount = amount + (amount * (1.5 / 100));// TODO: make paystack fee configurable
@@ -68,14 +68,14 @@ export class PaymentService {
       campaign: campaign._id,
       ref: reference,
       amount,
-      currency: campaign.target.currency,
+      currency: campaign.currency,
       techFee: ((appSetting?.techFeePercentage * amount) / 100) ?? 0,
     }).save();
   
     const charge = {
       amount: amount * 100,
       email: data.email ?? (campaign.owner as User).email,
-      currency: campaign.target.currency,
+      currency: campaign.currency,
       mobile_money: {
         phone: data.phone,
         provider: data.provider,
@@ -108,8 +108,10 @@ export class PaymentService {
     data: {
       reference: string;
       campaign: Payment['campaign'];
+      amount: number;
     },
   ): Promise<Payment> {
+    let { amount } = data;
     const campaign = await CampaignModel.findById(data.campaign);
 
     if (!campaign) throw new APIError({ message: 'Campaign not enroled', status: 404 });
@@ -119,7 +121,7 @@ export class PaymentService {
     const reference = data.reference;
     const appSetting = await AppSettingModel.findOne({});
 
-    let amount = campaign.target.amount;// factoring in paystack fee
+    // factoring in paystack fee
     amount = amount + (amount * (2.9 / 100));// TODO: make paystack fee configurable and check country
 
     const exististingPayment = await PaymentModel.findOne({ campaign: campaign._id, status: 'paid' });
@@ -130,7 +132,7 @@ export class PaymentService {
       campaign: campaign._id,
       ref: reference,
       amount,
-      currency: campaign.target.currency,
+      currency: campaign.currency,
       techFee: ((appSetting?.techFeePercentage * amount) / 100) ?? 0,
     }).save();
 

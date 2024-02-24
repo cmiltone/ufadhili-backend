@@ -51,18 +51,19 @@ export class PaymentController extends BaseHttpController {
         campaignId: Joi.string().required(),
         phone: Joi.string().required(),
         provider: Joi.string().equal('mpesa').required(),
+        amout: Joi.number().required(),
       }),
     }),
   )
   async payByMobileMoney(): Promise<void> {
     const {
       request: {
-        body: { campaignId, phone, provider },
+        body: { campaignId, phone, provider, amount },
       },
       response,
     } = this.httpContext;
 
-    const payment = await this.paymentService.payByMoileMoney({ campaign: campaignId, phone, provider });
+    const payment = await this.paymentService.payByMoileMoney({ campaign: campaignId, phone, provider, amount });
 
     response.json({ payment });
   }
@@ -74,18 +75,19 @@ export class PaymentController extends BaseHttpController {
       body: Joi.object({
         campaignId: Joi.string().required(),
         reference: Joi.string().required(),
+        amout: Joi.number().required(),
       }),
     }),
   )
   async payByCard(): Promise<void> {
     const {
       request: {
-        body: { campaignId, reference },
+        body: { campaignId, reference, amount },
       },
       response,
     } = this.httpContext;
 
-    const payment = await this.paymentService.payByCard({ campaign: campaignId, reference });
+    const payment = await this.paymentService.payByCard({ campaign: campaignId, reference, amount });
 
     response.json({ payment });
   }

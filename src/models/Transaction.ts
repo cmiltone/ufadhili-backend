@@ -2,26 +2,27 @@ import { Schema, model } from 'mongoose';
 
 import { DefaultDocument, PagedModel, SearchableModel } from '../types/db';
 import { defaultPlugin } from '../util/search';
-import { User } from './User';
+import { Campaign } from './Campaign';
 import { Payment } from './Payment';
 import { Payout } from './Payout';
 
-export type WalletTransaction = {
+export type Transaction = {
   _id?: string;
   amount: number;
-  user: string | User;
+  campaign: string | Campaign;
   currency: string;
   type: 'payin' | 'payout';
-  walletBalance: number;
+  raised: number;
+  current: number;
   payment?: Payment;
   payout?: Payout;
   createdAt?: Date;
   updatedAt?: Date;
 };
 
-export type WalletTransactionDocument = DefaultDocument & WalletTransaction;
+export type TransactionDocument = DefaultDocument & Transaction;
 
-const walletTransactionSchema = new Schema(
+const transactionSchema = new Schema(
   {
     amount: {
       type: Number,
@@ -31,9 +32,9 @@ const walletTransactionSchema = new Schema(
       type: String,
       required: true,
     },
-    user: {
+    campaign: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Campaign',
       required: true,
     },
     type: {
@@ -41,7 +42,11 @@ const walletTransactionSchema = new Schema(
       required: true,
       enum: ['payin', 'payout'],
     },
-    walletBalance: { // balance after transaction
+    raised: { // raised campaign balance after transaction
+      type: Number,
+      required: true,
+    },
+    current: { // current campaign balance after transaction
       type: Number,
       required: true,
     },
@@ -57,9 +62,9 @@ const walletTransactionSchema = new Schema(
   { timestamps: true },
 );
 
-walletTransactionSchema.plugin(defaultPlugin);
+transactionSchema.plugin(defaultPlugin);
 
-export const WalletTransactionModel = model<WalletTransactionDocument, PagedModel<WalletTransactionDocument> & SearchableModel<WalletTransactionDocument>>(
-  'walletTransaction',
-  walletTransactionSchema,
+export const TransactionModel = model<TransactionDocument, PagedModel<TransactionDocument> & SearchableModel<TransactionDocument>>(
+  'transaction',
+  transactionSchema,
 );

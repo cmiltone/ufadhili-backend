@@ -23,7 +23,7 @@ export class PayoutController extends BaseHttpController {
     '/initiate',
     celebrate({
       body: Joi.object({
-        userId: Joi.string().required(),
+        campaignId: Joi.string().required(),
         amount: Joi.number().required(),
         currency: Joi.string().required(),
       }),
@@ -32,12 +32,12 @@ export class PayoutController extends BaseHttpController {
   async initiate(): Promise<void> {
     const {
       request: {
-        body: { userId, amount, currency },
+        body: { campaignId, amount, currency },
       },
       response,
     } = this.httpContext;
 
-    const payout = await this.payoutService.initiate({ userId, amount, currency });
+    const payout = await this.payoutService.initiate({ campaignId, amount, currency });
 
     response.json({ payout });
   }
@@ -46,7 +46,7 @@ export class PayoutController extends BaseHttpController {
     '/',
     celebrate({
       body: Joi.object({
-        userId: Joi.string().required(),
+        campaignId: Joi.string().required(),
         amount: Joi.number().required(),
         currency: Joi.string().required(),
         ref: Joi.date().iso().required(),
@@ -58,12 +58,12 @@ export class PayoutController extends BaseHttpController {
   async create(): Promise<void> {
     const {
       request: {
-        body: { userId, ref, amount, currency, status, paymentMethod },
+        body: { campaignId, ref, amount, currency, status, paymentMethod },
       },
       response,
     } = this.httpContext;
 
-    const payout = await this.payoutService.create({ user: userId, ref, amount, currency, status, paymentMethod });
+    const payout = await this.payoutService.create({ campaign: campaignId, ref, amount, currency, status, paymentMethod });
 
     response.json({ payout });
   }
@@ -72,7 +72,7 @@ export class PayoutController extends BaseHttpController {
     '/:payoutId',
     celebrate({
       body: Joi.object({
-        userId: Joi.string(),
+        campaignId: Joi.string(),
         amount: Joi.string(),
         currency: Joi.string(),
         ref: Joi.string(),
@@ -84,13 +84,13 @@ export class PayoutController extends BaseHttpController {
   async update(): Promise<void> {
     const {
       request: {
-        body: { userId, amount, currency, ref, status, paymentMethod },
+        body: { campaignId, amount, currency, ref, status, paymentMethod },
         params: { payoutId },
       },
       response,
     } = this.httpContext;
 
-    const payout = await this.payoutService.update(payoutId, { user: userId, amount, currency, status, ref, paymentMethod });
+    const payout = await this.payoutService.update(payoutId, { campaign: campaignId, amount, currency, status, ref, paymentMethod });
 
     response.json({ payout });
   }
@@ -100,7 +100,7 @@ export class PayoutController extends BaseHttpController {
     celebrate({
       query: Joi.object({
         payoutId: Joi.string(),
-        userId: Joi.string(),
+        campaignId: Joi.string(),
         status: Joi.string(),
         q: Joi.string().allow(''),
         sort: Joi.string(),
@@ -112,7 +112,7 @@ export class PayoutController extends BaseHttpController {
     }),
   )
   async retrieve(): Promise<void> {
-    const { payoutId, sort, page, limit, dateStart, dateEnd, status, userId, q } = this.httpContext.request
+    const { payoutId, sort, page, limit, dateStart, dateEnd, status, campaignId, q } = this.httpContext.request
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .query as any;
 
@@ -126,7 +126,7 @@ export class PayoutController extends BaseHttpController {
 
     let query: Query = {};
 
-    if (userId) query = { ...query, ...{ user: userId } };
+    if (campaignId) query = { ...query, ...{ campaign: campaignId } };
 
     if (status) query = { ...query, ...{ status } };
 
@@ -148,7 +148,7 @@ export class PayoutController extends BaseHttpController {
       limit,
       q,
       populate: [
-        { path: 'user', }
+        { path: 'campaign', }
       ],
     });
 

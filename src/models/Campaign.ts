@@ -12,10 +12,10 @@ export type Campaign = {
   owner: string | User;
   description: string;
   status?: 'active' | 'inactive';
-  target: {
-    amount: number;
-    currency: 'KES' | 'USD',
-  };
+  target: number;
+  raised: number;
+  current: number;
+  currency: 'KES' | 'USD',
   coverImage?: string;
   category: CampaignCategory;
   suggestions?: string[];
@@ -28,11 +28,6 @@ export type CampaignDocument = DefaultDocument &
     addFields(): Promise<void>;
     _doc: Document;
   };
-
-export const priceSchema = new Schema({
-  amount: { type: Number, required: true, default: 0 },
-  currency: { type: String, enum: ['KES', 'USD'], required: true },
-}, { _id: false, timestamps: false });
 
 const CampaignSchema = new Schema(
   {
@@ -56,11 +51,10 @@ const CampaignSchema = new Schema(
       ref: 'User',
       required: true,
     },
-    target: {
-      type: priceSchema,
-      required: true,
-      default: 0,
-    },
+    target: { type: Number, required: true, default: 0 },
+    raised: { type: Number, default: 0 },
+    current: { type: Number, default: 0 },
+    currency: { type: String, enum: ['KES', 'USD'], default: 'KES', required: true },
     coverImage: {
       type: String,
       es_indexed: false,

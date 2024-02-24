@@ -4,9 +4,7 @@ import { pickBy } from 'lodash';
 import { PaymentModel } from '../models/Payment';
 import { AppSettingModel } from '../models/AppSetting';
 import { Campaign, CampaignModel } from '../models/Campaign';
-import { WalletTransactionModel } from '../models/WalletTransaction';
-import { User, UserModel } from '../models/User';
-import { convertCurrency } from '../util/helpers';
+import { TransactionModel } from '../models/Transaction';
 import { PayoutModel } from '../models/Payout';
 import { PaystackService } from './paystack';
 
@@ -78,38 +76,30 @@ export class PaymentEngineService {
         { $set: { status: 'active' }}
       );
 
-      //update wallet
+      //update raised and current
 
       if (campaign) {
-        const user = await UserModel.findById(((payment.campaign as Campaign).owner as User)._id);
-        const prevBalanace = user.wallet?.amount ?? 0;
-        let increment = _amount - (techFee + payment.paystackFee / 100);
-        let currency = campaign.target.currency;
+        const prevRaisedBalanace = campaign.raised ?? 0;
+        const prevCurrentBalance = campaign.current ?? 0;
+        const increment = _amount - (techFee + payment.paystackFee / 100);
+        const currency = campaign.currency;
 
-        if (user.wallet) {
-          const userCurr = user.wallet.currency;
-          if (currency != userCurr) {
-            const convertedAmount = await convertCurrency({ amount: increment, from: userCurr, to: currency });
-            currency = userCurr;
-            if (convertedAmount != -1) increment = convertedAmount;
-          }
-        }
-
-        await new WalletTransactionModel({
+        await new TransactionModel({
           amount: increment,
           currency: currency,
-          user: user._id,
-          walletBalance: prevBalanace + increment,
+          campaign: campaign._id,
+          raised: prevRaisedBalanace + increment,
+          current: prevCurrentBalance + increment,
           payment: payment._id,
           type: 'payin',
         }).save();
 
 
-        await UserModel.findByIdAndUpdate(user._id, {
+        await CampaignModel.findByIdAndUpdate(campaign._id, {
           $inc: {
-            'wallet.amount': increment,
+            current: increment,
+            raised: increment,
           },
-          $set: { 'wallet.currency': currency },
         })
       }
     } else {
@@ -169,37 +159,27 @@ export class PaymentEngineService {
 
 
       //update wallet
-      const user = await UserModel.findById((payout.user as User)._id);
+      const campaign = await CampaignModel.findById((payout.campaign as Campaign)._id);
 
-      if (user) {
-        const prevBalanace = user.wallet?.amount ?? 0;
-        let decrement = _amount + fee;
-        let currency = payout.currency;
+      if (campaign) {
+        const prevCurrentBalanace = campaign.current ?? 0;
+        const decrement = _amount + fee;
+        const currency = payout.currency;
 
-        if (user.wallet) {
-          const userCurr = user.wallet.currency;
-          if (currency != userCurr) {
-            const convertedAmount = await convertCurrency({ amount: decrement, from: userCurr, to: currency });
-            currency = userCurr;
-            if (convertedAmount != -1) decrement = convertedAmount;
-          }
-        }
-
-        await new WalletTransactionModel({
+        await new TransactionModel({
           amount: decrement,
           currency: currency,
-          user: user._id,
-          walletBalance: prevBalanace - decrement,
+          campaign: campaign._id,
+          current: prevCurrentBalanace - decrement,
           payout: payout._id,
           type: 'payout',
         }).save();
 
 
-        await UserModel.findByIdAndUpdate(user._id, {
+        await CampaignModel.findByIdAndUpdate(campaign._id, {
           $inc: {
-            'wallet.amount': -decrement,
+            current: -decrement,
           },
-          $set: { 'wallet.currency': currency },
         })
       }
     } else {

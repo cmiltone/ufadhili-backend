@@ -6,22 +6,6 @@ import { defaultPlugin, initSearch } from '../util/search';
 
 export type UserRole = 'contributor' | 'campaigner' | 'admin';
 
-export const userWalletSchema = new Schema({
-  amount: {
-    type: Number,
-    default: 0,
-    required: true,
-  },
-  currency: {
-    type: String,
-    default: 'KES',
-    required: true,
-  },
-  recipientCode: {
-    type: String,
-  }
-});
-
 export type User = {
   _id?: string;
   fullName: string;
@@ -34,11 +18,7 @@ export type User = {
   suggestions?: string[];
   phone: string;
   hash?: string;
-  wallet?: {
-    amount: number;
-    currency: "KES" | "USD";
-    recipientCode: string;
-  };
+  paystackRecipientCode: string;
   createdAt?: Date;
   updatedAt?: Date; 
 };
@@ -97,8 +77,8 @@ const userSchema = new Schema(
       type: String,
       select: false,
     },
-    wallet: {
-      type: userWalletSchema
+    paystackRecipientCode: {
+      type: String,
     },
   },
   { timestamps: true },
