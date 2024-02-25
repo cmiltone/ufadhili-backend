@@ -17,7 +17,7 @@ export class AppSettingService {
     
     appSetting = await AppSettingModel.findOneAndUpdate(
       { _id: appSetting?._id },
-      { $set: pickBy(data)  },
+      { $set: { ...pickBy(data) , ...{ techFeePercentage: data.techFeePercentage }}  },
       { upsert: true, useFindAndModify: false, runValidators: true, new: true },
     );
 

@@ -20,7 +20,7 @@ const appSettingSchema = new Schema(
     techFeePercentage: {
       type: Number,
       max: 100,
-      min: 1,
+      min: 0,
     },
     adminEmail: {
       type: String,

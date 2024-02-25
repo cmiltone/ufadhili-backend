@@ -81,7 +81,7 @@ export class PaymentEngineService {
       if (campaign) {
         const prevRaisedBalanace = campaign.raised ?? 0;
         const prevCurrentBalance = campaign.current ?? 0;
-        const increment = _amount - (techFee + payment.paystackFee / 100);
+        const increment = _amount - (techFee + payment.paystackFee);
         const currency = campaign.currency;
 
         await new TransactionModel({
